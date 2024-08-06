@@ -5,18 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import tedu.fintech.translator.domain.Translation;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
+import tedu.fintech.translator.repositories.InMemoryTranslationRepository;
+
 @SpringBootTest
 public class GoogleTranslateServiceTest {
 
@@ -26,6 +29,9 @@ public class GoogleTranslateServiceTest {
     @Autowired
     private RestTemplate restTemplate;
 
+    @MockBean
+    InMemoryTranslationRepository inMemoryTranslationRepository;
+
     private MockRestServiceServer mockServer;
 
     private final String API_KEY = "AIzaSyD6E0pPRK7JpLYEYtrmv8Wf0Kozt5Eqyd4";
@@ -33,6 +39,8 @@ public class GoogleTranslateServiceTest {
     @BeforeEach
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
+
+        inMemoryTranslationRepository.create(new Translation("Hello", "Hola"));
     }
 
     @Test

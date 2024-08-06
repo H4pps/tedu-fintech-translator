@@ -3,6 +3,8 @@ package tedu.fintech.translator.repositories;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import tedu.fintech.translator.domain.Translation;
+
 import java.util.List;
 
 @Repository

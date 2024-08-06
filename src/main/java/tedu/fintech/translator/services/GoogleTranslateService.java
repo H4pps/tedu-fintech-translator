@@ -10,10 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import tedu.fintech.translator.repositories.TranslationRepository;
-import tedu.fintech.translator.repositories.Translation;
+import tedu.fintech.translator.domain.Translation;
 // import javax.servlet.http.HttpServletRequest;
 
 @Component
@@ -49,7 +48,7 @@ public class GoogleTranslateService implements TranslationService {
             int statusCode = responseEntity.getStatusCode().value(); 
             // String ipAddress = request.getRemoteAddr();
             // translationRepository.create(new Translation(ipAddress, text, response));
-            translationRepository.create(new Translation(text, response));
+//            translationRepository.create(new Translation(text, response));
 
             return "http " + statusCode + " " + response;
         } catch (HttpClientErrorException e) {

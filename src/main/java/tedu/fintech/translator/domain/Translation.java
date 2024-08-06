@@ -1,4 +1,4 @@
-package tedu.fintech.translator.repositories;
+package tedu.fintech.translator.domain;
 
 public record Translation(
         // String ipAddress,
