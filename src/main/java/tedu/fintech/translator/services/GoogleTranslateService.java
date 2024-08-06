@@ -28,29 +28,32 @@ public class GoogleTranslateService implements TranslationService {
 
     @Override
     public String translate(String text, String sourceLanguage, String targetLanguage) {
-        String url = "https://translation.googleapis.com/language/translate/v2?key=" + API_KEY
-                + "&q=" + text
-                + "&source=" + sourceLanguage
-                + "&target=" + targetLanguage;
-
+        String url = getUrl(text, sourceLanguage, targetLanguage);
+        
         logger.info("URL: " + url);
         ResponseEntity<String> responseEntity = getResponseEntity(url);
         String response = parseResponseBody(responseEntity.getBody());
-        int statusCode = responseEntity.getStatusCode().value(); // Updated to use getStatusCode().value()
+        int statusCode = responseEntity.getStatusCode().value(); 
 
-        return "http " + statusCode + " " + response;
+        if (statusCode == 200) {
+            return "http " + statusCode + " " + response;
+        } else if (statusCode == 400) {
+            if (response.contains("language not found")) {
+                return "http " + statusCode + " Не найден язык исходного сообщения";
+            } 
+            // else if (response.contains("access denied")) {
+            //     return "http " + statusCode + " Ошибка доступа к ресурсу перевода";
+            // }
+        }
 
-        // if (statusCode == 200) {
-        //     return "http " + statusCode + " " + response;
-        // } else if (statusCode == 400) {
-        //     if (response.contains("language not found")) {
-        //         return "http " + statusCode + " Не найден язык исходного сообщения";
-        //     } 
-        //     // else if (response.contains("access denied")) {
-        //     //     return "http " + statusCode + " Ошибка доступа к ресурсу перевода";
-        //     // }
-        // }
-        // return "http " + statusCode + " Unknown error";
+        return "http " + statusCode + " Unknown error";
+    }
+
+    private String getUrl(String text, String sourceLanguage, String targetLanguage) {
+        return "https://translation.googleapis.com/language/translate/v2?key=" + API_KEY
+                + "&q=" + text
+                + "&source=" + sourceLanguage
+                + "&target=" + targetLanguage;
     }
 
     private ResponseEntity<String> getResponseEntity(String url) {

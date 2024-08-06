@@ -71,7 +71,7 @@ public class GoogleTranslateServiceTest {
 
 
     @Test
-    public void testEnToRu() {
+    public void bigTestEnToRu() {
         String text = "Hello world, this is my first program";
         String sourceLanguage = "en";
         String targetLanguage = "ru";
@@ -83,9 +83,28 @@ public class GoogleTranslateServiceTest {
                 .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
         String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+        System.out.println(translatedText);
 
         assertEquals("http 200 Привет мир, это является мой первый программа", translatedText);
     }
+    
+    @Test
+    public void bigTestRuToEn() {
+        String text = "Привет мир, это является мой первый программа";
+        String sourceLanguage = "ru";
+        String targetLanguage = "en";
+        String expectedResponse = "{\"data\":{\"translations\":[{\"translatedText\":\"Hello world, this is my first program\"}]}}";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+
+        mockServer.expect(requestTo(url))
+                .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 200 Hello world, this is my first program", translatedText);
+    }
+
 
     private String constructUrl(String text, String sourceLanguage, String targetLanguage) {
         try {
