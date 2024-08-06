@@ -135,6 +135,36 @@ public class GoogleTranslateServiceTest {
         assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
     }
 
+    @Test
+    public void testApiAccessDenied() {
+        String text = "Hello world, this is my first program";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.FORBIDDEN));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 403 Доступ к API запрещен", translatedText);
+    }
+
+    @Test
+    public void testInternalServerError() {
+        String text = "Hello world, this is my first program";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 500 Ошибка сервера", translatedText);
+    }
+
     private String constructUrl(String text, String sourceLanguage, String targetLanguage) {
         try {
             StringBuilder encodedText = new StringBuilder();

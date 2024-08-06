@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.http.HttpStatus;
 
 @Component
 public class GoogleTranslateService implements TranslationService {
@@ -34,10 +36,18 @@ public class GoogleTranslateService implements TranslationService {
             int statusCode = responseEntity.getStatusCode().value(); 
 
             return "http " + statusCode + " " + response;
-        } catch (HttpClientErrorException exception) {
-            return "http 400 Передан неподдерживаемый язык";
-        } catch (Exception exception) {
-            return "Unknown error";
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                return "http 400 Передан неподдерживаемый язык";
+            } else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+                return "http 403 Доступ к API запрещен";
+            }
+
+            return "http 400 Ошибка доступа к ресурсу";
+        } catch (HttpServerErrorException e) {
+            return "http 500 Ошибка сервера";
+        } catch (Exception e) {
+            return "НЕИЗВЕСТНАЯ ОШИБКА";
         }
 
         // if (statusCode == 200) {
