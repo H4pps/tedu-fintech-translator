@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 @SpringBootApplication
 public class TranslatorApplication {
 	private final Logger logger = LoggerFactory.getLogger(TranslatorApplication.class);
+
 	public static void main(String[] args) {
 		SpringApplication.run(TranslatorApplication.class, args);
 	}
@@ -19,8 +20,9 @@ public class TranslatorApplication {
 	@Bean
 	CommandLineRunner runner(GoogleTranslateService googleTranslateService) {
 		return args -> {
-			// logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "es"));
-			logger.info(googleTranslateService.translate("Hello world, this is my first program", "eng", "ru"));
+			logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "es"));
+			// logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "ru"));
+			// logger.info(googleTranslateService.translate("Hello world, this is my first program", "eng", "ru"));
 		};
 	}
 }

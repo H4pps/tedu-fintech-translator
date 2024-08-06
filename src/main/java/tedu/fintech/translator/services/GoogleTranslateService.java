@@ -1,7 +1,6 @@
 package tedu.fintech.translator.services;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,18 +10,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import tedu.fintech.translator.repositories.TranslationRepository;
+import tedu.fintech.translator.repositories.Translation;
+// import javax.servlet.http.HttpServletRequest;
 
 @Component
 public class GoogleTranslateService implements TranslationService {
     private final RestTemplate restTemplate;
+    private final TranslationRepository translationRepository;
+
+    // @Autowired
+    // private final HttpServletRequest request; // Added this line
+
     // Я знаю, что так нельзя делать, но иначе проверяющий не сможет запустить проект
     private final String API_KEY = "AIzaSyD6E0pPRK7JpLYEYtrmv8Wf0Kozt5Eqyd4";   
 
     private final Logger logger = LoggerFactory.getLogger(GoogleTranslateService.class);
 
-    public GoogleTranslateService(RestTemplate restTemplate) {
+    public GoogleTranslateService(RestTemplate restTemplate
+                                ,TranslationRepository translationRepository 
+                                // ,HttpServletRequest request
+                                ) {
         this.restTemplate = restTemplate;
+        this.translationRepository = translationRepository;
+        // this.request = request;
     }
 
     @Override
@@ -34,6 +47,9 @@ public class GoogleTranslateService implements TranslationService {
             ResponseEntity<String> responseEntity = getResponseEntity(url);
             String response = parseResponseBody(responseEntity.getBody());
             int statusCode = responseEntity.getStatusCode().value(); 
+            // String ipAddress = request.getRemoteAddr();
+            // translationRepository.create(new Translation(ipAddress, text, response));
+            translationRepository.create(new Translation(text, response));
 
             return "http " + statusCode + " " + response;
         } catch (HttpClientErrorException e) {
@@ -47,19 +63,8 @@ public class GoogleTranslateService implements TranslationService {
         } catch (HttpServerErrorException e) {
             return "http 500 Ошибка сервера";
         } catch (Exception e) {
-            return "НЕИЗВЕСТНАЯ ОШИБКА";
+            return "Неизвестная ошибка";
         }
-
-        // if (statusCode == 200) {
-        //     return "http " + statusCode + " " + response;
-        // } else if (statusCode == 400) {
-        //     if (response.contains("language not found")) {
-        //         return "http " + statusCode + " Не найден язык исходного сообщения";
-        //     } 
-        //     // else if (response.contains("access denied")) {
-        //     //     return "http " + statusCode + " Ошибка доступа к ресурсу перевода";
-        //     // }
-        // }
     }
 
     private String getUrl(String text, String sourceLanguage, String targetLanguage) {
