@@ -19,7 +19,8 @@ public class TranslatorApplication {
 	@Bean
 	CommandLineRunner runner(GoogleTranslateService googleTranslateService) {
 		return args -> {
-			logger.info(googleTranslateService.translate("Hello, world!", "en", "es"));
+			// logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "es"));
+			logger.info(googleTranslateService.translate("привет, меня зовут юра", "ru", "en"));
 		};
 	}
 }
