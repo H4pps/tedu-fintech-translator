@@ -20,7 +20,7 @@ public class TranslatorApplication {
 	CommandLineRunner runner(GoogleTranslateService googleTranslateService) {
 		return args -> {
 			// logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "es"));
-			logger.info(googleTranslateService.translate("Hello world, this is my first program", "en", "ru"));
+			logger.info(googleTranslateService.translate("Hello world, this is my first program", "eng", "ru"));
 		};
 	}
 }

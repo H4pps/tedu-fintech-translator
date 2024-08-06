@@ -9,10 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Component
 public class GoogleTranslateService implements TranslationService {
@@ -31,22 +28,28 @@ public class GoogleTranslateService implements TranslationService {
         String url = getUrl(text, sourceLanguage, targetLanguage);
         
         logger.info("URL: " + url);
-        ResponseEntity<String> responseEntity = getResponseEntity(url);
-        String response = parseResponseBody(responseEntity.getBody());
-        int statusCode = responseEntity.getStatusCode().value(); 
+        try {
+            ResponseEntity<String> responseEntity = getResponseEntity(url);
+            String response = parseResponseBody(responseEntity.getBody());
+            int statusCode = responseEntity.getStatusCode().value(); 
 
-        if (statusCode == 200) {
             return "http " + statusCode + " " + response;
-        } else if (statusCode == 400) {
-            if (response.contains("language not found")) {
-                return "http " + statusCode + " Не найден язык исходного сообщения";
-            } 
-            // else if (response.contains("access denied")) {
-            //     return "http " + statusCode + " Ошибка доступа к ресурсу перевода";
-            // }
+        } catch (HttpClientErrorException exception) {
+            return "http 400 Передан неподдерживаемый язык";
+        } catch (Exception exception) {
+            return "Unknown error";
         }
 
-        return "http " + statusCode + " Unknown error";
+        // if (statusCode == 200) {
+        //     return "http " + statusCode + " " + response;
+        // } else if (statusCode == 400) {
+        //     if (response.contains("language not found")) {
+        //         return "http " + statusCode + " Не найден язык исходного сообщения";
+        //     } 
+        //     // else if (response.contains("access denied")) {
+        //     //     return "http " + statusCode + " Ошибка доступа к ресурсу перевода";
+        //     // }
+        // }
     }
 
     private String getUrl(String text, String sourceLanguage, String targetLanguage) {

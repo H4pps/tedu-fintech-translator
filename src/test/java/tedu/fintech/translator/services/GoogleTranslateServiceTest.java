@@ -12,11 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
+import org.springframework.http.HttpStatus;
 @SpringBootTest
 public class GoogleTranslateServiceTest {
 
@@ -105,6 +105,35 @@ public class GoogleTranslateServiceTest {
         assertEquals("http 200 Hello world, this is my first program", translatedText);
     }
 
+    @Test
+    public void testUnsupportedSourceLanguage() {
+        String text = "Hello world, this is my first program";
+        String sourceLanguage = "unsupported";
+        String targetLanguage = "en";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
+    }
+
+    @Test
+    public void testUnsupportedTargetLanguage() {
+        String text = "Hello world, this is my first program";
+        String sourceLanguage = "en";
+        String targetLanguage = "unsupported";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
+    }
 
     private String constructUrl(String text, String sourceLanguage, String targetLanguage) {
         try {
