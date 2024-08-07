@@ -140,5 +140,54 @@ public class GoogleTranslateServiceTest {
         }
     }
 
+    @Test
+    public void testTranslateSuccess() {
+        String text = "hello world";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+        String expectedResponse1 = "{\"data\":{\"translations\":[{\"translatedText\":\"hola\"}]}}";
+        String expectedResponse2 = "{\"data\":{\"translations\":[{\"translatedText\":\"mundo\"}]}}";
 
+        String url1 = constructUrl("hello", sourceLanguage, targetLanguage);
+        String url2 = constructUrl("world", sourceLanguage, targetLanguage);
+
+        mockServer.expect(requestTo(url1))
+                .andRespond(withSuccess(expectedResponse1, MediaType.APPLICATION_JSON));
+        mockServer.expect(requestTo(url2))
+                .andRespond(withSuccess(expectedResponse2, MediaType.APPLICATION_JSON));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 200 hola mundo", translatedText);
+    }
+
+    @Test
+    public void testTranslateWithUnsupportedLanguage() {
+        String text = "hello";
+        String sourceLanguage = "en";
+        String targetLanguage = "xx";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
+    }
+
+    @Test
+    public void testTranslateWithServerError() {
+        String text = "hello";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        String translatedText = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 500 Ошибка сервера", translatedText);
+    }
 }
