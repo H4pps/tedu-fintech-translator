@@ -36,6 +36,10 @@ public class GoogleTranslateService implements TranslationService {
 
     @Override
     public String request(String text, String sourceLanguage, String targetLanguage) {
+        if (sourceLanguage.equals(targetLanguage)) {
+            return "Ошибка: преданы одинаковые языки";
+        }
+
         String publicIP = publicIPService.getPublicIP();
         String answer = translate(text, sourceLanguage, targetLanguage);
         if (!isTranslationError(answer)) {
