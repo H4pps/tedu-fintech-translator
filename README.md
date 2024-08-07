@@ -17,7 +17,7 @@
     cd tedu-fintech-translator
     ```
 
-2. Добавьте API ключ в файл `GoogleTranslateService.java`:
+2. Добавьте API ключ в файлы `GoogleTranslateService.java` и `GoogleTranslateServiceTest.java`:
     ```
     google.translate.api.key=<ваш API_KEY>
     ```
@@ -38,7 +38,7 @@
     git clone https://github.com/H4pps/tedu-fintech-translator.git 
     cd tedu-fintech-translator
     ``` 
-2. Добавьте API ключ в файл `GoogleTranslateService.java`:
+2. Добавьте API ключ в файлы `GoogleTranslateService.java` и `GoogleTranslateServiceTest.java`:
     ```
     google.translate.api.key=<ваш API_KEY>
     ```
@@ -109,3 +109,9 @@
 4. В поле `Password` ввести: `password`
 5. Нажать на кнопку `Connect`
 6. Вы увидите таблицу `TRANSLATIONS` с данными о переводах. 
+
+### Тесты
+Для того, чтобы запустить тесты, нужно выполнить команду из корневой директории проекта:
+```sh
+./mvnw test
+```
