@@ -120,9 +120,8 @@ public class GoogleTranslateService implements TranslationService {
             JsonNode node = objectMapper.readTree(response);
             return node.get("data").get("translations").get(0).get("translatedText").asText();
         } catch (JsonProcessingException e) {
-            // Handle the exception, e.g., log it and return an error message
             e.printStackTrace();
-            return "Error parsing response";
+            return "Ошибка обработки тела запроса";
         }
     }
 }

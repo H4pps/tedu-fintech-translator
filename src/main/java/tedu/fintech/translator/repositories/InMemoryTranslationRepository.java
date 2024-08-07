@@ -19,7 +19,6 @@ public class InMemoryTranslationRepository implements TranslationRepository {
     public void create(Translation request) {
         var updated = jdbcClient.sql("INSERT INTO Requests(ip_address, input_text, translated_text) VALUES (?, ?, ?)")
         .params(List.of(request.ipAddress(), request.inputText(), request.translatedText()))
-        // .params(List.of(request.inputText(), request.translatedText()))
         .update();
 
         Assert.state(updated == 1, "Ошибка сохранения перевода");
