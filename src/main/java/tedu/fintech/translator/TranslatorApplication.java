@@ -22,27 +22,28 @@ public class TranslatorApplication {
     @Bean
     CommandLineRunner runner(GoogleTranslateService googleTranslateService) {
         return args -> {
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("Введите исходный язык: ");
-                String sourceLanguage = scanner.nextLine();
+            try (Scanner scanner = new Scanner(System.in)) {
+                while (true) {
+                    System.out.print("Введите исходный язык: ");
+                    String sourceLanguage = scanner.nextLine();
 
-                System.out.print("Введите целевой язык: ");
-                String targetLanguage = scanner.nextLine();
+                    System.out.print("Введите целевой язык: ");
+                    String targetLanguage = scanner.nextLine();
 
-                System.out.print("Введите текст для перевода: ");
-                String text = scanner.nextLine();
+                    System.out.print("Введите текст для перевода: ");
+                    String text = scanner.nextLine();
 
-                String translationResult = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
-                System.out.println("Перевод: " + translationResult);
+                    String translationResult = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+                    System.out.println("Перевод: " + translationResult);
 
-                System.out.print("Завершить приложение? (y/n): ");
-                String finish = scanner.nextLine();
-                if (finish.equalsIgnoreCase("y")) {
-                    break;
+                    System.out.print("Завершить приложение? (y/n): ");
+                    String finish = scanner.nextLine();
+                    if (finish.equalsIgnoreCase("y")) {
+                        break;
+                    }
                 }
             }
-			System.exit(0);
+            System.exit(0);
         };
     }
 }
