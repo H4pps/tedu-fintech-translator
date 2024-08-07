@@ -69,21 +69,13 @@ public class GoogleTranslateService implements TranslationService {
                 }
             }
 
-            return translatedText.toString().trim();
+            return "http 200 " + translatedText.toString().trim();
         } finally {
             executor.shutdown();
         }
     }
 
-    private boolean isTranslationError(String response) {
-        return response.equals("http 400 Передан неподдерживаемый язык") || 
-               response.equals("http 403 Доступ к API запрещен") || 
-               response.equals("http 400 Ошибка доступа к ресурсу") || 
-               response.equals("http 500 Ошибка сервера") || 
-               response.equals("Неизвестная ошибка");
-    }
-
-    private String translateWord(String word, String sourceLanguage, String targetLanguage) {
+    public String translateWord(String word, String sourceLanguage, String targetLanguage) {
         String url = getUrl(word, sourceLanguage, targetLanguage);
         try {
             ResponseEntity<String> responseEntity = getResponseEntity(url);
@@ -101,6 +93,14 @@ public class GoogleTranslateService implements TranslationService {
         } catch (Exception e) {
             return "Неизвестная ошибка";
         }
+    }
+
+    private boolean isTranslationError(String response) {
+        return response.equals("http 400 Передан неподдерживаемый язык") || 
+               response.equals("http 403 Доступ к API запрещен") || 
+               response.equals("http 400 Ошибка доступа к ресурсу") || 
+               response.equals("http 500 Ошибка сервера") || 
+               response.equals("Неизвестная ошибка");
     }
 
     private String getUrl(String text, String sourceLanguage, String targetLanguage) {
