@@ -21,15 +21,28 @@ import java.util.List;
 public class GoogleTranslateService implements TranslationService {
     private final RestTemplate restTemplate;
     private final TranslationRepository translationRepository;
+    private final PublicIPService publicIPService;
 
     // Я знаю, что так нельзя делать, но иначе проверяющий не сможет запустить проект
     private final String API_KEY = "AIzaSyD6E0pPRK7JpLYEYtrmv8Wf0Kozt5Eqyd4";   
 
     private final Logger logger = LoggerFactory.getLogger(GoogleTranslateService.class);
 
-    public GoogleTranslateService(RestTemplate restTemplate,TranslationRepository translationRepository) {
+    public GoogleTranslateService(RestTemplate restTemplate,TranslationRepository translationRepository, PublicIPService publicIPService) {
         this.restTemplate = restTemplate;
         this.translationRepository = translationRepository;
+        this.publicIPService = publicIPService;
+    }
+
+    @Override
+    public String request(String text, String sourceLanguage, String targetLanguage) {
+        String publicIP = publicIPService.getPublicIP();
+        String answer = translate(text, sourceLanguage, targetLanguage);
+        if (!isTranslationError(answer)) {
+            translationRepository.create(new Translation(publicIP, text, answer));
+        }
+
+        return answer;
     }
 
     @Override
@@ -52,14 +65,11 @@ public class GoogleTranslateService implements TranslationService {
                     }
                     translatedText.append(result).append(" ");
                 } catch (InterruptedException | ExecutionException e) {
-                    logger.error("Error retrieving translation result", e);
                     return "Неизвестная ошибка при выводе результата перевода";
                 }
             }
 
-            String translated = translatedText.toString().trim();
-            translationRepository.create(new Translation(text, translated));
-            return translated;
+            return translatedText.toString().trim();
         } finally {
             executor.shutdown();
         }
@@ -75,7 +85,6 @@ public class GoogleTranslateService implements TranslationService {
 
     private String translateWord(String word, String sourceLanguage, String targetLanguage) {
         String url = getUrl(word, sourceLanguage, targetLanguage);
-        logger.info("URL: " + url);
         try {
             ResponseEntity<String> responseEntity = getResponseEntity(url);
             String response = parseResponseBody(responseEntity.getBody());

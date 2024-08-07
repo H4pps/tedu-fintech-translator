@@ -33,7 +33,7 @@ public class TranslatorApplication {
                     System.out.print("Введите текст для перевода: ");
                     String text = scanner.nextLine();
 
-                    String translationResult = googleTranslateService.translate(text, sourceLanguage, targetLanguage);
+                    String translationResult = googleTranslateService.request(text, sourceLanguage, targetLanguage);
                     System.out.println("Перевод: " + translationResult);
 
                     System.out.print("Завершить приложение? (y/n): ");
