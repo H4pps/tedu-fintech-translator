@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class GoogleTranslateServiceTest {
 
     @Autowired
@@ -54,7 +56,7 @@ public class GoogleTranslateServiceTest {
     @Test
     public void testTranslateWordError() {
         String text = "hello";
-        String sourceLanguage = "en";
+        String sourceLanguage = "eng";
         String targetLanguage = "es";
 
         String url = constructUrl(text, sourceLanguage, targetLanguage);
@@ -66,6 +68,68 @@ public class GoogleTranslateServiceTest {
         assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
     }
 
+    @Test
+    public void testTranslateWordUnsupportedLanguage() {
+        String text = "hello";
+        String sourceLanguage = "en";
+        String targetLanguage = "xx";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        String translatedText = googleTranslateService.translateWord(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 400 Передан неподдерживаемый язык", translatedText);
+    }
+
+    @Test
+    public void testTranslateEmptyString() {
+        String text = "";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+        String expectedResponse = "{\"data\":{\"translations\":[{\"translatedText\":\"\"}]}}";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+
+        mockServer.expect(requestTo(url))
+                .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
+
+        String translatedText = googleTranslateService.translateWord(text, sourceLanguage, targetLanguage);
+
+        assertEquals("", translatedText);
+    }
+
+    @Test
+    public void testTranslateNetworkError() {
+        String text = "hello";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
+
+        String translatedText = googleTranslateService.translateWord(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 503 Ошибка сервера", translatedText);
+    }
+
+    @Test
+    public void testTranslateServerError() {
+        String text = "hello";
+        String sourceLanguage = "en";
+        String targetLanguage = "es";
+
+        String url = constructUrl(text, sourceLanguage, targetLanguage);
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        String translatedText = googleTranslateService.translateWord(text, sourceLanguage, targetLanguage);
+
+        assertEquals("http 500 Ошибка сервера", translatedText);
+    }
+
     private String constructUrl(String text, String sourceLanguage, String targetLanguage) {
         try {
             return "https://translation.googleapis.com/language/translate/v2?key=" + API_KEY
@@ -75,4 +139,6 @@ public class GoogleTranslateServiceTest {
             throw new RuntimeException(e);
         }
     }
+
+
 }

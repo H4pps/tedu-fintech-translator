@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ public class TranslatorApplication {
     }
 
     @Bean
+    @Profile("!test")
     CommandLineRunner runner(GoogleTranslateService googleTranslateService) {
         return args -> {
             try (Scanner scanner = new Scanner(System.in)) {
