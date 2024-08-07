@@ -47,11 +47,7 @@ public class GoogleTranslateService implements TranslationService {
             for (Future<String> future : futures) {
                 try {
                     String result = future.get();
-                    if (result.equals("http 400 Передан неподдерживаемый язык") || 
-                        result.equals("http 403 Доступ к API запрещен") || 
-                        result.equals("http 400 Ошибка доступа к ресурсу") || 
-                        result.equals("http 500 Ошибка сервера") || 
-                        result.equals("Неизвестная ошибка")) {
+                    if (isTranslationError(result)) {
                         return result;
                     }
                     translatedText.append(result).append(" ");
@@ -67,6 +63,14 @@ public class GoogleTranslateService implements TranslationService {
         } finally {
             executor.shutdown();
         }
+    }
+
+    private boolean isTranslationError(String response) {
+        return response.equals("http 400 Передан неподдерживаемый язык") || 
+               response.equals("http 403 Доступ к API запрещен") || 
+               response.equals("http 400 Ошибка доступа к ресурсу") || 
+               response.equals("http 500 Ошибка сервера") || 
+               response.equals("Неизвестная ошибка");
     }
 
     private String translateWord(String word, String sourceLanguage, String targetLanguage) {
