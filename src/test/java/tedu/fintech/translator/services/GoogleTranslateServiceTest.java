@@ -29,7 +29,7 @@ public class GoogleTranslateServiceTest {
 
     private MockRestServiceServer mockServer;
 
-    private final String API_KEY = "AIzaSyD6E0pPRK7JpLYEYtrmv8Wf0Kozt5Eqyd4";
+    private final String API_KEY = "YOUR_API_KEY";
 
     @BeforeEach
     public void setUp() {

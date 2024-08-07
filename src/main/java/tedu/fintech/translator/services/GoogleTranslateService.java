@@ -24,7 +24,7 @@ public class GoogleTranslateService implements TranslationService {
     private final PublicIPService publicIPService;
 
     // Я знаю, что так нельзя делать, но иначе проверяющий не сможет запустить проект
-    private final String API_KEY = "AIzaSyD6E0pPRK7JpLYEYtrmv8Wf0Kozt5Eqyd4";   
+    private final String API_KEY = "YOUR_API_KEY";   
 
     private final Logger logger = LoggerFactory.getLogger(GoogleTranslateService.class);
 
